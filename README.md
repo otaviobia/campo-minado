@@ -1,5 +1,5 @@
 ![Interface do Jogo](https://i.imgur.com/s0mdQca.gif)
-# Campo Minado Clone
+# Sobre o Projeto
 💣 Esse é um projeto do jogo Campo Minado feito na **Unity 2022.3.13f1** como parte do processo de ingresso em um grupo de desenvolvimento de jogos. Em Campo Minado, o objetivo é revelar um campo de minas sem que nenhuma seja detonada a partir da análise do número de bombas nos quadrados adjacentes.
 
 ## Features
