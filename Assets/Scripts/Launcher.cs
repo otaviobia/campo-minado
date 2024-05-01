@@ -1,72 +1,98 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using UnityEngine.SceneManagement;
 using System.Linq;
+using TMPro;
+using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Launcher : MonoBehaviour
 {
-    [SerializeField] private Slider xSlider, ySlider, bombSlider, volumeSlider;
-    [SerializeField] private TextMeshProUGUI xText, yText, bombText, versionText, modoText, volumeText;
-    [SerializeField] private SaveSystem saveSystem;
     [SerializeField] private GameObject[] paineis;
+
+    [Header("Página do Modo Personalizado")]
+    [SerializeField] private Slider xSlider;
+    [SerializeField] private Slider ySlider;
+    [SerializeField] private Slider bombSlider;
+
+    [Header("Página do Placar")]
+    [SerializeField] private TextMeshProUGUI modoText;
+    [SerializeField] private Transform scoreContentBox;
     [SerializeField] private GameObject scorePrefab;
     [SerializeField] private GameObject avisoPlacar;
-    [SerializeField] private Transform scoreContentBox;
+
+    [Header("Página de Configurações")]
+    [SerializeField] private TextMeshProUGUI versionText;
+
+    [Header("Audio")]
     [SerializeField] private AudioManager audioManager;
     [SerializeField] private AudioMixer master;
+    [SerializeField] private Slider volumeSlider;
 
-    private AjustesDeJogo modoEscolhido;
+    [Header("Salvamento")]
+    [SerializeField] private SaveSystem saveSystem;
 
-    private readonly AjustesDeJogo facil = new(AjustesDeJogo.Modo.Facil, new Vector2Int(9, 9), 10);
-    private readonly AjustesDeJogo medio = new(AjustesDeJogo.Modo.Medio, new Vector2Int(16, 16), 40);
-    private readonly AjustesDeJogo dificil = new(AjustesDeJogo.Modo.Dificil, new Vector2Int(24, 20), 99);
-    private readonly AjustesDeJogo customizado = new(AjustesDeJogo.Modo.Customizado, Vector2Int.one * 5, 5);
+    private AjustesDeJogo _ajustesDeJogo;
 
-    private int placarAtual = 0;
-    private Placar p = new();
+    private readonly AjustesDeJogo _modoFacil = new(AjustesDeJogo.Modo.Facil, new Vector2Int(9, 9), 10);
+    private readonly AjustesDeJogo _modoMedio = new(AjustesDeJogo.Modo.Medio, new Vector2Int(16, 16), 40);
+    private readonly AjustesDeJogo _modoDificil = new(AjustesDeJogo.Modo.Dificil, new Vector2Int(24, 20), 99);
+    private readonly AjustesDeJogo _modoCustomizado = new(AjustesDeJogo.Modo.Customizado, Vector2Int.one * 5, 5);
+
+    private int _placarExibido = 0;
+    private Placar _placar = new();
+
+    private void Awake()
+    {
+        _ajustesDeJogo = _modoFacil;
+
+        Screen.SetResolution(400, 600, false);
+
+        versionText.text = "Versão " + Application.version.ToString();
+
+        CarregarVolume();
+
+        MostrarPontuacoes(0);
+    }
 
     public int MenorTempo(Pontuacao x, Pontuacao y)
     {
-        if (x.tempoFinal > y.tempoFinal)
+        if (x.TempoFinal > y.TempoFinal)
         {
             return 1;
         }
         return -1;
     }
 
-    private void Awake()
-    {
-        modoEscolhido = facil;
-
-        Screen.SetResolution(400, 600, false);
-
-        versionText.text = "Versão " + Application.version.ToString();
-
-        MostrarPontuacoes(0);
-    }
-
     public void SomDeClique()
     {
-        audioManager.PlaySound(AudioManager.SoundType.SELECTION, 3);
+        audioManager.TocarSom(AudioManager.TipoDeSom.CLIQUE, 3);
     }
     
+    public void CarregarVolume()
+    {
+        float volumeSalvo = saveSystem.Carregar<PreferenciasDoUsuario>(new()).VolumeMestre;
+        volumeSlider.SetValueWithoutNotify(volumeSalvo);
+        volumeSlider.GetComponent<TextMeshProUGUI>().text = Mathf.Floor(volumeSlider.value * 100).ToString() + "%";
+    }
+
     public void AtualizarVolume()
     {
         master.SetFloat("mastervol", Mathf.Log10(volumeSlider.value) * 20);
-        volumeText.text = Mathf.Floor(volumeSlider.value*100).ToString() + "%";
+        volumeSlider.GetComponent<TextMeshProUGUI>().text = Mathf.Floor(volumeSlider.value*100).ToString() + "%";
+        
+        PreferenciasDoUsuario preferencias = saveSystem.Carregar<PreferenciasDoUsuario>(new());
+        preferencias.VolumeMestre = volumeSlider.value;
+        saveSystem.Salvar(preferencias);
     }
 
     public void MostrarPontuacoes(int modoDesejado)
     {
-        placarAtual += modoDesejado;
+        _placarExibido += modoDesejado;
 
-        if (placarAtual < 0) placarAtual = 3;
-        if (placarAtual > 3) placarAtual = 0;
+        if (_placarExibido < 0) _placarExibido = 3;
+        if (_placarExibido > 3) _placarExibido = 0;
 
-        switch (placarAtual)
+        switch (_placarExibido)
         {
             case 0:
                 modoText.text = "Fácil";
@@ -88,31 +114,31 @@ public class Launcher : MonoBehaviour
         // Limpar lista de pontuações atual se existir
         while (scoreContentBox.childCount > 0)
         {
-            Transform g = scoreContentBox.GetChild(0).transform;
-            g.SetParent(null);
-            Destroy(g.gameObject);
+            Transform caixaDePontuacao = scoreContentBox.GetChild(0).transform;
+            caixaDePontuacao.SetParent(null);
+            Destroy(caixaDePontuacao.gameObject);
         }
 
-        p = saveSystem.Carregar<Placar>(new());
+        _placar = saveSystem.Carregar<Placar>(new());
 
-        if (p == null || p.pontuacoes.Where(x => x.modoDeJogo == (AjustesDeJogo.Modo)placarAtual).Count() == 0)
+        if (_placar == null || _placar.Pontuacoes.Where(x => x.ModoDoJogo == (AjustesDeJogo.Modo)_placarExibido).Count() == 0)
         {
             avisoPlacar.SetActive(true);
             return;
         }
 
         avisoPlacar.SetActive(false);
-        p.pontuacoes.Sort(MenorTempo);
+        _placar.Pontuacoes.Sort(MenorTempo);
 
-        int i = 1;
+        int colocacaoAtual = 1;
 
-        foreach (Pontuacao pont in p.pontuacoes.Where(x => x.modoDeJogo == (AjustesDeJogo.Modo)placarAtual))
+        foreach (Pontuacao pontuacao in _placar.Pontuacoes.Where(x => x.ModoDoJogo == (AjustesDeJogo.Modo)_placarExibido))
         {
-            GameObject o = Instantiate(scorePrefab, scoreContentBox);
-            o.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = i + ".";
-            o.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = pont.modoDeJogo + " (" + pont.tamanhoDoTabuleiro.x + "x" + pont.tamanhoDoTabuleiro.y + "/" + pont.numeroDeBombas + " bombas)\n" + pont.dataDaPontuacao + "\n" + pont.tempoFinal.ToString() + " segundos";
+            GameObject caixaDePontuacao = Instantiate(scorePrefab, scoreContentBox);
+            caixaDePontuacao.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = colocacaoAtual + ".";
+            caixaDePontuacao.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = pontuacao.ModoDoJogo + " (" + pontuacao.DimensoesDoTabuleiro.x + "x" + pontuacao.DimensoesDoTabuleiro.y + "/" + pontuacao.QuantidadeDeBombas + " bombas)\n" + pontuacao.DataDaPontuacao + "\n" + pontuacao.TempoFinal.ToString() + " segundos";
 
-            i++;
+            colocacaoAtual++;
         }
     }
 
@@ -122,21 +148,10 @@ public class Launcher : MonoBehaviour
         MostrarPontuacoes(0);
     }
 
-    private void Start()
+    public void AtualizarSlider(Slider slider)
     {
-        xSlider.minValue = 5; xSlider.maxValue = 32;
-        ySlider.minValue = 5; ySlider.maxValue = 32;
-
-        bombSlider.minValue = 0;
-    }
-
-    private void Update()
-    {
-        xText.text = xSlider.value.ToString();
-        yText.text = ySlider.value.ToString();
-        bombText.text = bombSlider.value.ToString();
-
         bombSlider.maxValue = xSlider.value * ySlider.value;
+        slider.GetComponent<TextMeshProUGUI>().text = slider.value.ToString();
     }
 
     public void TrocarPainel(int painel)
@@ -153,16 +168,16 @@ public class Launcher : MonoBehaviour
         switch (modo)
         {
             case 0:
-                modoEscolhido = facil;
+                _ajustesDeJogo = _modoFacil;
                 break;
             case 1:
-                modoEscolhido = medio;
+                _ajustesDeJogo = _modoMedio;
                 break;
             case 2:
-                modoEscolhido = dificil;
+                _ajustesDeJogo = _modoDificil;
                 break;
             case 3:
-                modoEscolhido = customizado;
+                _ajustesDeJogo = _modoCustomizado;
                 break;
             default: break;
         }
@@ -170,9 +185,9 @@ public class Launcher : MonoBehaviour
 
     public void IniciarJogo()
     {
-        customizado.tamanhoDoTabuleiro = new Vector2Int((int)xSlider.value, (int)ySlider.value);
-        customizado.numeroDeBombas = (int)bombSlider.value;
-        saveSystem.Salvar<AjustesDeJogo>(new(modoEscolhido.modoAtual, new Vector2Int(modoEscolhido.tamanhoDoTabuleiro.x, modoEscolhido.tamanhoDoTabuleiro.y), modoEscolhido.numeroDeBombas));
+        _modoCustomizado.DimensoesDoTabuleiro = new Vector2Int((int)xSlider.value, (int)ySlider.value);
+        _modoCustomizado.QuantidadeDeBombas = (int)bombSlider.value;
+        saveSystem.Salvar<AjustesDeJogo>(new(_ajustesDeJogo.ModoAtual, new Vector2Int(_ajustesDeJogo.DimensoesDoTabuleiro.x, _ajustesDeJogo.DimensoesDoTabuleiro.y), _ajustesDeJogo.QuantidadeDeBombas));
 
         SceneManager.LoadScene(1);
     }

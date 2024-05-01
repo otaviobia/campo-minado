@@ -1,81 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 using Random = UnityEngine.Random;
 
 public class CM_Engine : MonoBehaviour
 {
-    public Tabuleiro tabuleiro;
+    [HideInInspector] public Tabuleiro Tabuleiro;
 
-    private int _numBombas = 0;
+    private int _qtdTotalDeBombas = 0;
     private bool _tabuleiroIncializado = false;
 
+    public event EventHandler GanhouJogo;
     public event EventHandler<PerdeuJogoEventArgs> PerdeuJogo;
     public class PerdeuJogoEventArgs : EventArgs
     {
-        public Casa ultimaCasaClicada;
+        public Casa UltimaCasaClicada;
     }
-
-    public event EventHandler GanhouJogo;
 
     public void CriarMatriz(Vector2Int dimensoes)
     {
-        tabuleiro = new(dimensoes);
+        Tabuleiro = new(dimensoes);
 
         for (int i = 0; i < dimensoes.x; i++)
         {
             for (int j = 0; j < dimensoes.y; j++)
             {
-                tabuleiro.casas[i, j] = new Casa(true, false, false, new Vector2Int(i, j), 0);
+                Tabuleiro.Casas[i, j] = new Casa(true, false, false, new Vector2Int(i, j), 0);
             }
         }
     }
 
     public void AdicionarBombas(Casa casaDesconsiderada, int numeroDeBombas)
     {
-        numeroDeBombas = Mathf.Clamp(numeroDeBombas, 0, tabuleiro.dimensao.x * tabuleiro.dimensao.y);
+        numeroDeBombas = Mathf.Clamp(numeroDeBombas, 0, Tabuleiro.Dimensoes.x * Tabuleiro.Dimensoes.y);
 
-        List<Vector2Int> coordenadas = tabuleiro.ListarCoordenadas();
-        if (numeroDeBombas < tabuleiro.dimensao.x * tabuleiro.dimensao.y) coordenadas.Remove(casaDesconsiderada.coordenadas);
+        List<Vector2Int> coordenadas = Tabuleiro.ListarCoordenadas();
+        if (numeroDeBombas < Tabuleiro.Dimensoes.x * Tabuleiro.Dimensoes.y) coordenadas.Remove(casaDesconsiderada.Coordenadas);
 
         for (int i = 1; i <= numeroDeBombas; i++)
         {
             int posAleatoria = Random.Range(0, coordenadas.Count);
 
-            tabuleiro.bombas.Add(tabuleiro.EncontrarCasa(coordenadas[posAleatoria]));
-            tabuleiro.EncontrarCasa(coordenadas[posAleatoria]).tem_bomba = true;
+            Tabuleiro.Bombas.Add(Tabuleiro.EncontrarCasa(coordenadas[posAleatoria]));
+            Tabuleiro.EncontrarCasa(coordenadas[posAleatoria]).TemBomba = true;
             coordenadas.RemoveAt(posAleatoria);
         }
     }
 
     public void AdicionarNumeros()
     {
-        foreach (Casa bomba in tabuleiro.bombas)
+        foreach (Casa bomba in Tabuleiro.Bombas)
         {
-            foreach (Casa casa in tabuleiro.EncontrarVizinhos(bomba))
+            foreach (Casa casa in Tabuleiro.EncontrarVizinhos(bomba))
             {
-                casa.numero++;
+                casa.Numero++;
             }
         }
     }
 
     public void AbrirCaminho(Casa casaInicial)
     {
-        casaInicial.escondida = false;
+        casaInicial.Escondida = false;
 
-        foreach(Casa cs in tabuleiro.EncontrarVizinhos(casaInicial))
+        foreach(Casa casaVizinha in Tabuleiro.EncontrarVizinhos(casaInicial))
         {
-            if (cs.numero == 0 && !cs.tem_bomba && cs.escondida)
+            if (casaVizinha.Numero == 0 && !casaVizinha.TemBomba && casaVizinha.Escondida)
             {
-                cs.escondida = false;
-                AbrirCaminho(cs);
+                casaVizinha.Escondida = false;
+                AbrirCaminho(casaVizinha);
                 continue;
             }
             
-            if (cs.numero != 0 && !cs.tem_bomba && cs.escondida)
+            if (casaVizinha.Numero != 0 && !casaVizinha.TemBomba && casaVizinha.Escondida)
             {
-                cs.escondida = false;
+                casaVizinha.Escondida = false;
             }
         }
     }
@@ -85,23 +83,23 @@ public class CM_Engine : MonoBehaviour
         if (!_tabuleiroIncializado)
         {
             _tabuleiroIncializado = true;
-            AdicionarBombas(casaDescoberta, _numBombas);
+            AdicionarBombas(casaDescoberta, _qtdTotalDeBombas);
             AdicionarNumeros();
         }
 
-        if (casaDescoberta.tem_bandeira || !casaDescoberta.escondida) return false;
+        if (casaDescoberta.TemBandeira || !casaDescoberta.Escondida) return false;
 
-        if (casaDescoberta.tem_bomba)
+        if (casaDescoberta.TemBomba)
         {
             PerderJogo(casaDescoberta);
             return false;
         }
 
-        if (casaDescoberta.numero == 0) AbrirCaminho(casaDescoberta);
+        if (casaDescoberta.Numero == 0) AbrirCaminho(casaDescoberta);
 
-        if (casaDescoberta.numero > 0)
+        if (casaDescoberta.Numero > 0)
         {
-            casaDescoberta.escondida = false;
+            casaDescoberta.Escondida = false;
         }
 
         if (ChecarVitoria()) GanharJogo();
@@ -111,12 +109,12 @@ public class CM_Engine : MonoBehaviour
 
     public void AlterarBandeira(Casa destino)
     {
-        destino.tem_bandeira = !destino.tem_bandeira;
+        destino.TemBandeira = !destino.TemBandeira;
     }
 
     private void PerderJogo(Casa bombaExplodida)
     {
-        PerdeuJogo?.Invoke(this, new PerdeuJogoEventArgs { ultimaCasaClicada = bombaExplodida });
+        PerdeuJogo?.Invoke(this, new PerdeuJogoEventArgs { UltimaCasaClicada = bombaExplodida });
     }
 
     private void GanharJogo()
@@ -126,9 +124,9 @@ public class CM_Engine : MonoBehaviour
 
     public bool ChecarVitoria()
     {
-        foreach (Casa c in tabuleiro.EncontrarCasas(true))
+        foreach (Casa casa in Tabuleiro.EncontrarCasas(true))
         {
-            if (!c.tem_bomba) return false;
+            if (!casa.TemBomba) return false;
         }
 
         return true;
@@ -137,6 +135,6 @@ public class CM_Engine : MonoBehaviour
     public void GerarTabuleiro(Vector2Int suasDimensoes, int numeroDeBombas)
     {
         CriarMatriz(suasDimensoes);
-        _numBombas = numeroDeBombas;
+        _qtdTotalDeBombas = numeroDeBombas;
     }
 }

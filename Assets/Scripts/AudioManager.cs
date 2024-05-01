@@ -3,32 +3,33 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public List<Sound> sounds;
-    private AudioSource m_AudioSource;
+    [SerializeField] private List<Audio> audios;
 
-    public enum SoundType
+    private AudioSource _TocadorDeAudio;
+
+    public enum TipoDeSom
     {
-        EXPLOSION,
-        SELECTION,
-        WIN,
-        FLAG,
-        UNFLAG
+        EXPLOSAO,
+        CLIQUE,
+        VENCER,
+        BOTAR_BANDEIRA,
+        TIRAR_BANDEIRA
     }
 
     void Start()
     {
-        m_AudioSource = GetComponent<AudioSource>();
+        _TocadorDeAudio = GetComponent<AudioSource>();
     }
 
-    public void PlaySound(SoundType sound, float volume)
+    public void TocarSom(TipoDeSom som, float volume)
     {
-        m_AudioSource.PlayOneShot(sounds[(int)sound].source, volume);
+        _TocadorDeAudio.PlayOneShot(audios[(int)som].Fonte, volume);
     }
 }
 
 [System.Serializable]
-public class Sound
+public class Audio
 {
-    public string name;
-    public AudioClip source;
+    public string Nome;
+    public AudioClip Fonte;
 }

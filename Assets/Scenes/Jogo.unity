@@ -317,17 +317,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b8bcc03ed71b4c9e3515c16559ab0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sounds:
-  - name: EXPLOSION
-    source: {fileID: 8300000, guid: 270ff0122eb83ff4eb95f741c6200503, type: 3}
-  - name: SELECTION
-    source: {fileID: 8300000, guid: 2b7170bfd2b69c64381cf9fa0a13da96, type: 3}
-  - name: WIN
-    source: {fileID: 8300000, guid: 84fe6a5d86dce6f41acef0dec9ade909, type: 3}
-  - name: FLAG
-    source: {fileID: 8300000, guid: 1ba00544faf664640a54e09dece4fa44, type: 3}
-  - name: UNFLAG
-    source: {fileID: 8300000, guid: 66e5a47e2f149e648ad36093e7c9b716, type: 3}
+  audios:
+  - Nome: EXPLOSAO
+    Fonte: {fileID: 8300000, guid: 270ff0122eb83ff4eb95f741c6200503, type: 3}
+  - Nome: CLIQUE
+    Fonte: {fileID: 8300000, guid: 2b7170bfd2b69c64381cf9fa0a13da96, type: 3}
+  - Nome: VENCER
+    Fonte: {fileID: 8300000, guid: 84fe6a5d86dce6f41acef0dec9ade909, type: 3}
+  - Nome: BOTAR_BANDEIRA
+    Fonte: {fileID: 8300000, guid: 1ba00544faf664640a54e09dece4fa44, type: 3}
+  - Nome: TIRAR_BANDEIRA
+    Fonte: {fileID: 8300000, guid: 66e5a47e2f149e648ad36093e7c9b716, type: 3}
 --- !u!4 &156120269
 Transform:
   m_ObjectHideFlags: 0
@@ -1048,6 +1048,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   engine: {fileID: 1230992065}
   saveSystem: {fileID: 1230992067}
+  audioManager: {fileID: 156120268}
+  objetoTabuleiro: {fileID: 824078152}
+  casaPrefab: {fileID: 4529614004463058480, guid: 23b5af6bfff137445b2f766504f3ea78, type: 3}
   texturas:
   - {fileID: -869585316, guid: 0d57371e687b83e47a70f1c662a7e64a, type: 3}
   - {fileID: -516434078, guid: 0d57371e687b83e47a70f1c662a7e64a, type: 3}
@@ -1063,13 +1066,10 @@ MonoBehaviour:
   - {fileID: -1664699833, guid: 0d57371e687b83e47a70f1c662a7e64a, type: 3}
   - {fileID: 39015505, guid: 0d57371e687b83e47a70f1c662a7e64a, type: 3}
   - {fileID: 1553261707, guid: 0d57371e687b83e47a70f1c662a7e64a, type: 3}
-  casaPrefab: {fileID: 4529614004463058480, guid: 23b5af6bfff137445b2f766504f3ea78, type: 3}
-  objetoTabuleiro: {fileID: 824078152}
   bombasTexto: {fileID: 1579704444}
   tempoTexto: {fileID: 790458334}
   menuBotao: {fileID: 2023683530}
   tamanhoDaCasa: 30
-  audioManager: {fileID: 156120268}
 --- !u!114 &1230992067
 MonoBehaviour:
   m_ObjectHideFlags: 0

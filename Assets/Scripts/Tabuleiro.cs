@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class Tabuleiro
 {
-    public Vector2Int dimensao;
-    public Casa[,] casas;
-    public List<Casa> bombas;
+    public Vector2Int Dimensoes;
+    public Casa[,] Casas;
+    public List<Casa> Bombas;
 
     public Casa EncontrarCasa(Vector2Int coordenada)
     {
-        foreach (var casa in casas)
+        foreach (var casa in Casas)
         {
-            if (casa.coordenadas == coordenada)
+            if (casa.Coordenadas == coordenada)
             {
                 return casa;
             }
@@ -23,11 +23,11 @@ public class Tabuleiro
     {
         List<Casa> lista = new();
 
-        foreach (var casa in casas)
+        foreach (var casa in Casas)
         {
-            if (escondida && casa.escondida) lista.Add(casa);
-            else if (tem_bomba && casa.tem_bomba) lista.Add(casa);
-            else if (tem_bandeira && casa.tem_bandeira) lista.Add(casa);
+            if (escondida && casa.Escondida) lista.Add(casa);
+            else if (tem_bomba && casa.TemBomba) lista.Add(casa);
+            else if (tem_bandeira && casa.TemBandeira) lista.Add(casa);
         }
         return lista;
     }
@@ -43,9 +43,9 @@ public class Tabuleiro
                 if (i == 0 && j == 0)
                     continue;
 
-                Vector2Int coordenadasVizinho = new(casa.coordenadas.x + i, casa.coordenadas.y + j);
+                Vector2Int coordenadasVizinho = new(casa.Coordenadas.x + i, casa.Coordenadas.y + j);
 
-                if (coordenadasVizinho.x >= 0 && coordenadasVizinho.x < dimensao.x && coordenadasVizinho.y >= 0 && coordenadasVizinho.y < dimensao.y)
+                if (coordenadasVizinho.x >= 0 && coordenadasVizinho.x < Dimensoes.x && coordenadasVizinho.y >= 0 && coordenadasVizinho.y < Dimensoes.y)
                 {
                     Casa casaVizinha = EncontrarCasa(coordenadasVizinho);
 
@@ -64,9 +64,9 @@ public class Tabuleiro
     {
         List<Vector2Int> lista = new();
 
-        for (int x = 0; x < dimensao.x; x++)
+        for (int x = 0; x < Dimensoes.x; x++)
         {
-            for (int y = 0; y < dimensao.y; y++)
+            for (int y = 0; y < Dimensoes.y; y++)
             {
                 lista.Add(new Vector2Int(x, y));
             }
@@ -77,8 +77,8 @@ public class Tabuleiro
 
     public Tabuleiro(Vector2Int dimensao)
     {
-        this.dimensao = dimensao;
-        this.casas = new Casa[dimensao.x, dimensao.y];
-        this.bombas = new List<Casa>();
+        this.Dimensoes = dimensao;
+        this.Casas = new Casa[dimensao.x, dimensao.y];
+        this.Bombas = new List<Casa>();
     }
 }
