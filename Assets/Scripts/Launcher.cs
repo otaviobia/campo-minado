@@ -22,7 +22,7 @@ public class Launcher : MonoBehaviour
 
     private readonly AjustesDeJogo facil = new(AjustesDeJogo.Modo.Facil, new Vector2Int(9, 9), 10);
     private readonly AjustesDeJogo medio = new(AjustesDeJogo.Modo.Medio, new Vector2Int(16, 16), 40);
-    private readonly AjustesDeJogo dificil = new(AjustesDeJogo.Modo.Dificil, new Vector2Int(20, 24), 99);
+    private readonly AjustesDeJogo dificil = new(AjustesDeJogo.Modo.Dificil, new Vector2Int(24, 20), 99);
     private readonly AjustesDeJogo customizado = new(AjustesDeJogo.Modo.Customizado, Vector2Int.one * 5, 5);
 
     private int placarAtual = 0;
@@ -93,7 +93,7 @@ public class Launcher : MonoBehaviour
             Destroy(g.gameObject);
         }
 
-        p = saveSystem.CarregarPlacar();
+        p = saveSystem.Carregar<Placar>(new());
 
         if (p == null || p.pontuacoes.Where(x => x.modoDeJogo == (AjustesDeJogo.Modo)placarAtual).Count() == 0)
         {
@@ -118,7 +118,7 @@ public class Launcher : MonoBehaviour
 
     public void ResetarPlacar()
     {
-        saveSystem.LimparPlacar();
+        saveSystem.Deletar<Placar>(new());
         MostrarPontuacoes(0);
     }
 
@@ -172,7 +172,7 @@ public class Launcher : MonoBehaviour
     {
         customizado.tamanhoDoTabuleiro = new Vector2Int((int)xSlider.value, (int)ySlider.value);
         customizado.numeroDeBombas = (int)bombSlider.value;
-        saveSystem.SalvarAjustes(modoEscolhido.modoAtual, modoEscolhido.tamanhoDoTabuleiro.x, modoEscolhido.tamanhoDoTabuleiro.y, modoEscolhido.numeroDeBombas);
+        saveSystem.Salvar<AjustesDeJogo>(new(modoEscolhido.modoAtual, new Vector2Int(modoEscolhido.tamanhoDoTabuleiro.x, modoEscolhido.tamanhoDoTabuleiro.y), modoEscolhido.numeroDeBombas));
 
         SceneManager.LoadScene(1);
     }

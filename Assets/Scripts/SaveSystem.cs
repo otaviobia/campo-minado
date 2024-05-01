@@ -4,55 +4,28 @@ using UnityEngine;
 
 public class SaveSystem : MonoBehaviour
 {
-    // O modo customizado permite o usuário escolher as dimensões do tabuleiro e o número de bombas
-    // Um arquivo .json é utilizado para transmitir a escolha do usuário entre as cenas do programa  
-    public void SalvarAjustes(AjustesDeJogo.Modo modo, int tamX, int tamY, int bombas)
+    public void Salvar<T>(T a)
     {
-        AjustesDeJogo ajustes = new(modo, new Vector2Int(tamX, tamY), bombas);
+        string dados = JsonUtility.ToJson(a);
+        string diretorio = Application.dataPath + "/" + a.ToString() + ".json";
 
-        string dadosAjustes = JsonUtility.ToJson(ajustes);
-        string diretorio = Application.dataPath + "/ajustes_de_jogo.json";
-
-        System.IO.File.WriteAllText(diretorio, dadosAjustes);
+        System.IO.File.WriteAllText(diretorio, dados);
     }
 
-    public AjustesDeJogo LerAjustes()
+    public T Carregar<T>(T a)
     {
-        string diretorio = Application.dataPath + "/ajustes_de_jogo.json";
-        string dadosAjustes = System.IO.File.ReadAllText(diretorio);
+        string diretorio = Application.dataPath + "/" + a.ToString() + ".json";
+        if (!System.IO.File.Exists(diretorio)) return a;
+        string dados = System.IO.File.ReadAllText(diretorio);
 
-        AjustesDeJogo modoDeJogo = JsonUtility.FromJson<AjustesDeJogo>(dadosAjustes);
+        T t = JsonUtility.FromJson<T>(dados);
 
-        return modoDeJogo;
+        return t;
     }
 
-    // Ao vencer o jogo, o programa adiciona ao placar uma nova pontuação que contém o tempo final
-    // de jogo, a data e hora real, o modo de jogo e as definições do tabuleiro (caso customizado)
-    public void SalvarPontuacao(Pontuacao novaPontuacao)
+    public void Deletar<T>(T a)
     {
-        Placar placar = CarregarPlacar();
-        placar.pontuacoes.Add(novaPontuacao);
-
-        string dadosPlacar = JsonUtility.ToJson(placar);
-        string diretorio = Application.dataPath + "/placar.json";
-
-        System.IO.File.WriteAllText(diretorio, dadosPlacar);
-    }
-
-    public Placar CarregarPlacar()
-    {
-        string diretorio = Application.dataPath + "/placar.json";
-        if (!System.IO.File.Exists(diretorio)) return new Placar();
-        string dadosPlacar = System.IO.File.ReadAllText(diretorio);
-
-        Placar placar = JsonUtility.FromJson<Placar>(dadosPlacar);
-
-        return placar;
-    }
-
-    public void LimparPlacar()
-    {
-        string diretorio = Application.dataPath + "/placar.json";
+        string diretorio = Application.dataPath + "/" + a.ToString() + ".json";
         if (!System.IO.File.Exists(diretorio)) return;
         System.IO.File.Delete(diretorio);
     }
@@ -102,5 +75,16 @@ public class AjustesDeJogo
         modoAtual = modo;
         tamanhoDoTabuleiro = tamanho;
         numeroDeBombas = bombas;
+    }
+}
+
+[Serializable]
+public class PreferenciasDoUsuario
+{
+    public float volumeMestre;
+
+    public PreferenciasDoUsuario(float volume)
+    {
+        volumeMestre = volume;
     }
 }

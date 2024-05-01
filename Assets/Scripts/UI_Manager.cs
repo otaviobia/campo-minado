@@ -28,7 +28,7 @@ public class UI_Manager : MonoBehaviour
         engine.GanhouJogo += AoGanharJogo;
         engine.PerdeuJogo += AoPerderJogo;
 
-        ajustesDeJogo = saveSystem.LerAjustes();
+        ajustesDeJogo = saveSystem.Carregar<AjustesDeJogo>(new(AjustesDeJogo.Modo.Facil, Vector2Int.one * 9, 10));
         inicialDeBombas = ajustesDeJogo.numeroDeBombas;
 
         engine.GerarTabuleiro(ajustesDeJogo.tamanhoDoTabuleiro, ajustesDeJogo.numeroDeBombas);
@@ -85,8 +85,9 @@ public class UI_Manager : MonoBehaviour
         audioManager.PlaySound(AudioManager.SoundType.WIN, 1);
 
         Pontuacao novaPontuacao = new(DateTime.Now.ToString("G"), (float)Math.Round((double)Time.timeSinceLevelLoad, 2), ajustesDeJogo.modoAtual, ajustesDeJogo.tamanhoDoTabuleiro, inicialDeBombas);
-        
-        saveSystem.SalvarPontuacao(novaPontuacao);
+        Placar placarAtualizado = saveSystem.Carregar<Placar>(new());
+        placarAtualizado.pontuacoes.Add(novaPontuacao);
+        saveSystem.Salvar<Placar>(placarAtualizado);
 
         foreach (Casa c in engine.tabuleiro.EncontrarCasas(false, true))
         {
