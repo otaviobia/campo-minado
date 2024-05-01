@@ -3,16 +3,20 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.Audio;
+using UnityEngine.Rendering;
 
 public class Launcher : MonoBehaviour
 {
-    [SerializeField] private Slider xSlider, ySlider, bombSlider;
-    [SerializeField] private TextMeshProUGUI xText, yText, bombText, versionText, modoText;
+    [SerializeField] private Slider xSlider, ySlider, bombSlider, volumeSlider;
+    [SerializeField] private TextMeshProUGUI xText, yText, bombText, versionText, modoText, volumeText;
     [SerializeField] private SaveSystem saveSystem;
     [SerializeField] private GameObject[] paineis;
     [SerializeField] private GameObject scorePrefab;
     [SerializeField] private GameObject avisoPlacar;
     [SerializeField] private Transform scoreContentBox;
+    [SerializeField] private AudioManager audioManager;
+    [SerializeField] private AudioMixer master;
 
     private AjustesDeJogo modoEscolhido;
 
@@ -35,11 +39,24 @@ public class Launcher : MonoBehaviour
 
     private void Awake()
     {
+        modoEscolhido = facil;
+
         Screen.SetResolution(400, 600, false);
 
         versionText.text = "Versão " + Application.version.ToString();
 
         MostrarPontuacoes(0);
+    }
+
+    public void SomDeClique()
+    {
+        audioManager.PlaySound(AudioManager.SoundType.SELECTION, 3);
+    }
+    
+    public void AtualizarVolume()
+    {
+        master.SetFloat("mastervol", Mathf.Log10(volumeSlider.value) * 20);
+        volumeText.text = Mathf.Floor(volumeSlider.value*100).ToString() + "%";
     }
 
     public void MostrarPontuacoes(int modoDesejado)

@@ -19,6 +19,7 @@ public class UI_Manager : MonoBehaviour
 
     private List<GameObject> matrizCasas = new();
     private bool _timerRodando = true;
+    private Collider2D lastHit = null;
 
     private int inicialDeBombas;
 
@@ -135,12 +136,35 @@ public class UI_Manager : MonoBehaviour
 
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 
+        if (lastHit != hit.collider)
+        {
+            if (lastHit != null)
+            {
+                lastHit.transform.localScale = Vector3.one * 1.0f;
+                lastHit.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
+            }
+
+            if (hit.collider != null && engine.tabuleiro.EncontrarCasa(new Vector2Int((int)hit.transform.localPosition.x, (int)hit.transform.localPosition.y)).escondida)
+            {
+                hit.transform.localScale = Vector3.one * 1.1f;
+                hit.collider.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
+            }
+
+            lastHit = hit.collider;
+        }
+
         if (Input.GetKeyDown(KeyCode.Mouse0) && hit.collider != null)
         {
             if (!_timerRodando)
             {
                 SceneManager.LoadScene(1);
                 return;
+            }
+
+            if (lastHit != null)
+            {
+                lastHit.transform.localScale = Vector3.one * 1.0f;
+                lastHit.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
             }
 
             Vector2Int a = new((int)hit.collider.gameObject.transform.localPosition.x, (int)hit.collider.gameObject.transform.localPosition.y);
