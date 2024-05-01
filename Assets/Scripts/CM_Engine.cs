@@ -8,9 +8,11 @@ public class CM_Engine : MonoBehaviour
     [HideInInspector] public Tabuleiro Tabuleiro;
 
     private int _qtdTotalDeBombas = 0;
+    private int _qtdDeCliques = 0;
     private bool _tabuleiroIncializado = false;
 
     public event EventHandler GanhouJogo;
+    public event EventHandler CasaComBandeiraFoiAberta;
     public event EventHandler<PerdeuJogoEventArgs> PerdeuJogo;
     public class PerdeuJogoEventArgs : EventArgs
     {
@@ -35,7 +37,19 @@ public class CM_Engine : MonoBehaviour
         numeroDeBombas = Mathf.Clamp(numeroDeBombas, 0, Tabuleiro.Dimensoes.x * Tabuleiro.Dimensoes.y);
 
         List<Vector2Int> coordenadas = Tabuleiro.ListarCoordenadas();
-        if (numeroDeBombas < Tabuleiro.Dimensoes.x * Tabuleiro.Dimensoes.y) coordenadas.Remove(casaDesconsiderada.Coordenadas);
+
+        if (numeroDeBombas < Tabuleiro.Dimensoes.x * Tabuleiro.Dimensoes.y)
+        {
+            coordenadas.Remove(casaDesconsiderada.Coordenadas);
+        }
+
+        if (numeroDeBombas < (Tabuleiro.Dimensoes.x * Tabuleiro.Dimensoes.y)-9)
+        {
+            foreach(Casa casa in Tabuleiro.EncontrarVizinhos(casaDesconsiderada))
+            {
+                coordenadas.Remove(casa.Coordenadas);
+            }
+        }
 
         for (int i = 1; i <= numeroDeBombas; i++)
         {
@@ -66,6 +80,13 @@ public class CM_Engine : MonoBehaviour
         {
             if (casaVizinha.Numero == 0 && !casaVizinha.TemBomba && casaVizinha.Escondida)
             {
+                if (casaVizinha.TemBandeira && _qtdDeCliques < 2)
+                {
+                    CasaComBandeiraFoiAberta?.Invoke(this, EventArgs.Empty);
+                }
+
+                if (casaVizinha.TemBandeira && _qtdDeCliques > 1) continue;
+                
                 casaVizinha.Escondida = false;
                 AbrirCaminho(casaVizinha);
                 continue;
@@ -73,6 +94,8 @@ public class CM_Engine : MonoBehaviour
             
             if (casaVizinha.Numero != 0 && !casaVizinha.TemBomba && casaVizinha.Escondida)
             {
+                if (casaVizinha.TemBandeira && _qtdDeCliques < 2) CasaComBandeiraFoiAberta?.Invoke(this, EventArgs.Empty);
+                if (casaVizinha.TemBandeira && _qtdDeCliques > 1) continue;
                 casaVizinha.Escondida = false;
             }
         }
@@ -80,6 +103,8 @@ public class CM_Engine : MonoBehaviour
 
     public bool DescobrirCasa(Casa casaDescoberta)
     {
+        _qtdDeCliques++;
+
         if (!_tabuleiroIncializado)
         {
             _tabuleiroIncializado = true;

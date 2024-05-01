@@ -24,7 +24,7 @@ public class UI_Manager : MonoBehaviour
     [Header("Configurações de Tela")]
     [SerializeField] private int tamanhoDaCasa;
 
-    private AjustesDeJogo _ajustesDeJogo;
+    public AjustesDeJogo _ajustesDeJogo;
     private int _qtdInicialDeBombas;
     private readonly List<GameObject> _matrizDeCasas = new();
     private bool _timerRodando = true;
@@ -34,6 +34,7 @@ public class UI_Manager : MonoBehaviour
     {
         engine.GanhouJogo += AoGanharJogo;
         engine.PerdeuJogo += AoPerderJogo;
+        engine.CasaComBandeiraFoiAberta += AumentarNumeroDeBombas;
 
         _ajustesDeJogo = saveSystem.Carregar<AjustesDeJogo>(new(AjustesDeJogo.Modo.Facil, Vector2Int.one * 9, 10));
         _qtdInicialDeBombas = _ajustesDeJogo.QuantidadeDeBombas;
@@ -52,6 +53,12 @@ public class UI_Manager : MonoBehaviour
         }
 
         AjeitarCamera();
+    }
+
+    private void AumentarNumeroDeBombas(object sender, EventArgs e)
+    {
+        _ajustesDeJogo.QuantidadeDeBombas++;
+        bombasTexto.text = _ajustesDeJogo.QuantidadeDeBombas.ToString();
     }
 
     public void GerarDesignResponsivo()
