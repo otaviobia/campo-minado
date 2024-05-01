@@ -72,7 +72,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Local scoreboard and settings
-Assets/ajustes_de_jogo.json
-Assets/ajustes_de_jogo.json.meta
-Assets/placar.json
-Assets/placar.json.meta
+Assets/AjustesDeJogo.json
+Assets/AjustesDeJogo.json.meta
+Assets/Placar.json
+Assets/Placar.json.meta
+Assets/PreferenciasDoUsuario.json
+Assets/PreferenciasDoUsuario.json.meta
