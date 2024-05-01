@@ -15,6 +15,7 @@ public class UI_Manager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI bombasTexto, tempoTexto;
     [SerializeField] private Transform menuBotao;
     [SerializeField] private int tamanhoDaCasa;
+    [SerializeField] private AudioManager audioManager;
 
     private List<GameObject> matrizCasas = new();
     private bool _timerRodando = true;
@@ -80,6 +81,8 @@ public class UI_Manager : MonoBehaviour
 
     public void AoGanharJogo(object sender, EventArgs e)
     {
+        audioManager.PlaySound(AudioManager.SoundType.WIN, 1);
+
         Pontuacao novaPontuacao = new(DateTime.Now.ToString("G"), (float)Math.Round((double)Time.timeSinceLevelLoad, 2), ajustesDeJogo.modoAtual, ajustesDeJogo.tamanhoDoTabuleiro, inicialDeBombas);
         
         saveSystem.SalvarPontuacao(novaPontuacao);
@@ -101,6 +104,8 @@ public class UI_Manager : MonoBehaviour
 
     public void AoPerderJogo(object sender, CM_Engine.PerdeuJogoEventArgs e)
     {
+        audioManager.PlaySound(AudioManager.SoundType.EXPLOSION, 1);
+
         foreach (Casa c in engine.tabuleiro.EncontrarCasas(false, true))
         {
             foreach (GameObject g in matrizCasas)
@@ -139,7 +144,7 @@ public class UI_Manager : MonoBehaviour
             }
 
             Vector2Int a = new((int)hit.collider.gameObject.transform.localPosition.x, (int)hit.collider.gameObject.transform.localPosition.y);
-            engine.DescobrirCasa(engine.tabuleiro.EncontrarCasa(a));
+            if (engine.DescobrirCasa(engine.tabuleiro.EncontrarCasa(a))) audioManager.PlaySound(AudioManager.SoundType.SELECTION, 1);
 
             foreach (GameObject g in matrizCasas)
             {
@@ -173,12 +178,16 @@ public class UI_Manager : MonoBehaviour
                     {
                         if (engine.tabuleiro.EncontrarCasa(gc).tem_bandeira)
                         {
+                            audioManager.PlaySound(AudioManager.SoundType.FLAG, 1);
+
                             g.GetComponent<SpriteRenderer>().sprite = texturas[10];
                             ajustesDeJogo.numeroDeBombas--;
                             bombasTexto.text = ajustesDeJogo.numeroDeBombas.ToString();
                         }
                         else
                         {
+                            audioManager.PlaySound(AudioManager.SoundType.UNFLAG, 1);
+
                             g.GetComponent<SpriteRenderer>().sprite = texturas[9];
                             ajustesDeJogo.numeroDeBombas++;
                             bombasTexto.text = ajustesDeJogo.numeroDeBombas.ToString();

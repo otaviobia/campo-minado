@@ -80,7 +80,7 @@ public class CM_Engine : MonoBehaviour
         }
     }
 
-    public void DescobrirCasa(Casa casaDescoberta)
+    public bool DescobrirCasa(Casa casaDescoberta)
     {
         if (!_tabuleiroIncializado)
         {
@@ -89,12 +89,12 @@ public class CM_Engine : MonoBehaviour
             AdicionarNumeros();
         }
 
-        if (casaDescoberta.tem_bandeira) return;
+        if (casaDescoberta.tem_bandeira || !casaDescoberta.escondida) return false;
 
         if (casaDescoberta.tem_bomba)
         {
             PerderJogo(casaDescoberta);
-            return;
+            return false;
         }
 
         if (casaDescoberta.numero == 0) AbrirCaminho(casaDescoberta);
@@ -105,6 +105,8 @@ public class CM_Engine : MonoBehaviour
         }
 
         if (ChecarVitoria()) GanharJogo();
+
+        return true;
     }
 
     public void AlterarBandeira(Casa destino)
