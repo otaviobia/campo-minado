@@ -45,7 +45,7 @@ public class Launcher : MonoBehaviour
     {
         _ajustesDeJogo = _modoFacil;
 
-        Screen.SetResolution(400, 600, false);
+        AcertarResolucao();
 
         versionText.text = "Versão " + Application.version.ToString();
 
@@ -53,7 +53,33 @@ public class Launcher : MonoBehaviour
 
         MostrarPontuacoes(0);
     }
+    
+    public void AcertarResolucao()
+    {
+        float width = Screen.currentResolution.width;
+        float height = Screen.currentResolution.height;
 
+        if (width/height == 16f/9f)
+        {
+            Screen.SetResolution(Mathf.FloorToInt(width / 4.8f), Mathf.FloorToInt(height / 1.8f), false);
+            return;
+        }
+
+        if (width/height == 16f/10f) 
+        {
+            Screen.SetResolution(Mathf.FloorToInt(width / 4.2f), Mathf.FloorToInt(height / 1.75f), false);
+            return;
+        }
+        
+        if (width/height == 4f/3f)
+        {
+            Screen.SetResolution(Mathf.FloorToInt(width / 3.5f), Mathf.FloorToInt(height / 1.75f), false);
+            return;
+        }
+
+        Screen.SetResolution(400, 600, false);
+    }
+    
     public int MenorTempo(Pontuacao x, Pontuacao y)
     {
         if (x.TempoFinal > y.TempoFinal)

@@ -21,9 +21,8 @@ public class UI_Manager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI tempoTexto;
     [SerializeField] private Transform menuBotao;
 
-    [Header("Configurações de Tela")]
-    [SerializeField] private int tamanhoDaCasa;
 
+    private int _tamanhoDaCasa;
     public AjustesDeJogo _ajustesDeJogo;
     private int _qtdInicialDeBombas;
     private readonly List<GameObject> _matrizDeCasas = new();
@@ -32,6 +31,8 @@ public class UI_Manager : MonoBehaviour
 
     private void Start()
     {
+        _tamanhoDaCasa = Screen.currentResolution.width / 64;
+
         engine.GanhouJogo += AoGanharJogo;
         engine.PerdeuJogo += AoPerderJogo;
         engine.CasaComBandeiraFoiAberta += AumentarNumeroDeBombas;
@@ -63,7 +64,7 @@ public class UI_Manager : MonoBehaviour
 
     public void GerarDesignResponsivo()
     {
-        Screen.SetResolution(_ajustesDeJogo.DimensoesDoTabuleiro.x * tamanhoDaCasa, _ajustesDeJogo.DimensoesDoTabuleiro.y * tamanhoDaCasa + tamanhoDaCasa + 10, false);
+        Screen.SetResolution(_ajustesDeJogo.DimensoesDoTabuleiro.x * _tamanhoDaCasa, _ajustesDeJogo.DimensoesDoTabuleiro.y * _tamanhoDaCasa + _tamanhoDaCasa + 10, false);
 
         bombasTexto.transform.parent.position = new Vector3(0.4014f, _ajustesDeJogo.DimensoesDoTabuleiro.y + 0.2f, 0);
         tempoTexto.transform.parent.position = new Vector3(_ajustesDeJogo.DimensoesDoTabuleiro.x - 1.4014f, _ajustesDeJogo.DimensoesDoTabuleiro.y + 0.2f, 0);
