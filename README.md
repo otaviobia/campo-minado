@@ -1,10 +1,10 @@
 ![Interface do Jogo](https://i.imgur.com/s0mdQca.gif)
 # Sobre o Projeto
-💣 Esse é um projeto do jogo Campo Minado feito na **Unity 2022.3.13f1** como parte do processo de ingresso em um grupo de desenvolvimento de jogos. Em Campo Minado, o objetivo é revelar um campo de minas sem que nenhuma seja detonada a partir da análise do número de bombas nos quadrados adjacentes.
+💣 Esse é um projeto do jogo Campo Minado feito na [**Unity 2022.3.13f1**](https://unity.com/releases/editor/whats-new/2022.3.13) como parte do processo de ingresso em um grupo de desenvolvimento de jogos. Em Campo Minado, o objetivo é revelar um campo de minas sem que nenhuma seja detonada a partir da análise do número de bombas nos quadrados adjacentes.
 
 ## Features
 
-A versão atual (1.0.0) contém as seguintes mecânicas implementadas:
+A versão atual (1.1.0) contém as seguintes mecânicas implementadas:
 
  ☑️ Distribuição aleatória de bombas
 
@@ -22,15 +22,13 @@ A versão atual (1.0.0) contém as seguintes mecânicas implementadas:
 
  ☑️ Contador de minas e tempo de jogo
 
-## Roadmap
+ ☑️ Primeiro clique sempre abre várias casas
 
-Antes de considerar o projeto finalizado pretendo adicionar:
+ ☑️ Área de jogo adaptada ao tamanho do monitor
 
-🔲 Sons de clique, vitória e derrota
+## Status do Projeto
 
-🔲 Primeiro clique sempre abre várias casas
-
-🔲 Adaptar área de jogo dependendo do tamanho do monitor
+O projeto encontra-se finalizado: a partir de agora possíveis atualizações serão [correções de bugs](https://github.com/otaviobia/campo-minado/issues) ou melhorias na performance.
 
 ## Aviso
-⚠️O Windows Defender costuma retornar falsos positivos ao executar as builds do jogo.
+⚠️O Windows Defender pode retornar um falso positivo ao executar o jogo pela primeira vez.
