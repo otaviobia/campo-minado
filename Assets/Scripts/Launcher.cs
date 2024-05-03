@@ -32,18 +32,21 @@ public class Launcher : MonoBehaviour
     [SerializeField] private SaveSystem saveSystem;
 
     private AjustesDeJogo _ajustesDeJogo;
+    private AjustesDeJogo[] _modosDisponiveis;
 
-    private readonly AjustesDeJogo _modoFacil = new(AjustesDeJogo.Modo.Facil, new Vector2Int(9, 9), 10);
-    private readonly AjustesDeJogo _modoMedio = new(AjustesDeJogo.Modo.Medio, new Vector2Int(16, 16), 40);
-    private readonly AjustesDeJogo _modoDificil = new(AjustesDeJogo.Modo.Dificil, new Vector2Int(24, 20), 99);
-    private readonly AjustesDeJogo _modoCustomizado = new(AjustesDeJogo.Modo.Customizado, Vector2Int.one * 5, 5);
+    private string[] _nomesDasDificuldades = { "Fácil", "Médio", "Difícil", "Customizado" };
 
     private int _placarExibido = 0;
     private Placar _placar = new();
 
     private void Awake()
     {
-        _ajustesDeJogo = _modoFacil;
+        _modosDisponiveis[0] = new(AjustesDeJogo.Modo.Facil, new Vector2Int(9, 9), 10);
+        _modosDisponiveis[1] = new(AjustesDeJogo.Modo.Medio, new Vector2Int(16, 16), 40);
+        _modosDisponiveis[2] = new(AjustesDeJogo.Modo.Dificil, new Vector2Int(24, 20), 99);
+        _modosDisponiveis[3] = new(AjustesDeJogo.Modo.Customizado, Vector2Int.one * 5, 5);
+
+        _ajustesDeJogo = _modosDisponiveis[0];
 
         AcertarResolucao();
 
@@ -91,7 +94,7 @@ public class Launcher : MonoBehaviour
 
     public void SomDeClique()
     {
-        audioManager.TocarSom(AudioManager.TipoDeSom.CLIQUE, 3);
+        audioManager.TocarSom(AudioManager.TipoDeSom.CLIQUE, 1);
     }
     
     public void CarregarVolume()
@@ -113,36 +116,16 @@ public class Launcher : MonoBehaviour
 
     public void MostrarPontuacoes(int modoDesejado)
     {
+        // A variável modoDesejado pode ser 1, 0 ou -1 (vai pro placar da frente, o atual ou de trás)
         _placarExibido += modoDesejado;
-
-        if (_placarExibido < 0) _placarExibido = 3;
         if (_placarExibido > 3) _placarExibido = 0;
-
-        switch (_placarExibido)
-        {
-            case 0:
-                modoText.text = "Fácil";
-                break;
-            case 1:
-                modoText.text = "Médio";
-                break;
-            case 2:
-                modoText.text = "Difícil";
-                break;
-            case 3:
-                modoText.text = "Customizado";
-                break;
-            default:
-                modoText.text = "Erro";
-                break;
-        }
+        if (_placarExibido < 0) _placarExibido = 3;
+        modoText.text = _nomesDasDificuldades[_placarExibido];
 
         // Limpar lista de pontuações atual se existir
-        while (scoreContentBox.childCount > 0)
+        foreach (Transform pontuacao in scoreContentBox)
         {
-            Transform caixaDePontuacao = scoreContentBox.GetChild(0).transform;
-            caixaDePontuacao.SetParent(null);
-            Destroy(caixaDePontuacao.gameObject);
+            Destroy(pontuacao.gameObject);
         }
 
         _placar = saveSystem.Carregar<Placar>(new());
@@ -191,28 +174,14 @@ public class Launcher : MonoBehaviour
 
     public void EscolherModo(int modo)
     {
-        switch (modo)
-        {
-            case 0:
-                _ajustesDeJogo = _modoFacil;
-                break;
-            case 1:
-                _ajustesDeJogo = _modoMedio;
-                break;
-            case 2:
-                _ajustesDeJogo = _modoDificil;
-                break;
-            case 3:
-                _ajustesDeJogo = _modoCustomizado;
-                break;
-            default: break;
-        }
+        _ajustesDeJogo = _modosDisponiveis[modo];
     }
 
     public void IniciarJogo()
     {
-        _modoCustomizado.DimensoesDoTabuleiro = new Vector2Int((int)xSlider.value, (int)ySlider.value);
-        _modoCustomizado.QuantidadeDeBombas = (int)bombSlider.value;
+        _modosDisponiveis[3].DimensoesDoTabuleiro = new Vector2Int((int)xSlider.value, (int)ySlider.value);
+        _modosDisponiveis[3].QuantidadeDeBombas = (int)bombSlider.value;
+
         saveSystem.Salvar<AjustesDeJogo>(new(_ajustesDeJogo.ModoAtual, new Vector2Int(_ajustesDeJogo.DimensoesDoTabuleiro.x, _ajustesDeJogo.DimensoesDoTabuleiro.y), _ajustesDeJogo.QuantidadeDeBombas));
 
         SceneManager.LoadScene(1);

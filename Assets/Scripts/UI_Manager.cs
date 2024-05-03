@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 public class UI_Manager : MonoBehaviour
@@ -28,6 +29,7 @@ public class UI_Manager : MonoBehaviour
     private readonly List<GameObject> _matrizDeCasas = new();
     private bool _timerRodando = true;
     private Collider2D _ultimaCasaSelecionada = null;
+    private RaycastHit2D casaSelecionada;
 
     private void Start()
     {
@@ -102,7 +104,7 @@ public class UI_Manager : MonoBehaviour
         Pontuacao novaPontuacao = new(DateTime.Now.ToString("G"), (float)Math.Round((double)Time.timeSinceLevelLoad, 2), _ajustesDeJogo.ModoAtual, _ajustesDeJogo.DimensoesDoTabuleiro, _qtdInicialDeBombas);
         Placar placarAtualizado = saveSystem.Carregar<Placar>(new());
         placarAtualizado.Pontuacoes.Add(novaPontuacao);
-        saveSystem.Salvar<Placar>(placarAtualizado);
+        saveSystem.Salvar(placarAtualizado);
 
         foreach (Casa casaComBomba in engine.Tabuleiro.EncontrarCasas(false, true))
         {
@@ -146,12 +148,8 @@ public class UI_Manager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    private void Update()
+    private void RessaltarCasasAoMouse()
     {
-        if (_timerRodando) tempoTexto.text = Time.timeSinceLevelLoad.ToString("0");
-
-        RaycastHit2D casaSelecionada = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-
         if (_ultimaCasaSelecionada != casaSelecionada.collider)
         {
             if (_ultimaCasaSelecionada != null)
@@ -160,15 +158,23 @@ public class UI_Manager : MonoBehaviour
                 _ultimaCasaSelecionada.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
             }
 
-            if (casaSelecionada.collider != null && engine.Tabuleiro.EncontrarCasa(new Vector2Int((int)casaSelecionada.transform.localPosition.x, (int)casaSelecionada.transform.localPosition.y)).Escondida)
+            if (casaSelecionada.collider != null)
             {
-                casaSelecionada.transform.localScale = Vector3.one * 1.1f;
-                casaSelecionada.collider.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                Casa casaRessaltada = engine.Tabuleiro.EncontrarCasa(new Vector2Int((int)casaSelecionada.transform.localPosition.x, (int)casaSelecionada.transform.localPosition.y));
+
+                if (casaRessaltada.Escondida)
+                {
+                    casaSelecionada.transform.localScale = Vector3.one * 1.1f;
+                    casaSelecionada.collider.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                }
             }
 
             _ultimaCasaSelecionada = casaSelecionada.collider;
         }
+    }
 
+    private void DetectarCliqueEsquerdo()
+    {
         if (Input.GetKeyDown(KeyCode.Mouse0) && casaSelecionada.collider != null)
         {
             if (!_timerRodando)
@@ -196,15 +202,12 @@ public class UI_Manager : MonoBehaviour
                 }
             }
         }
+    }
 
+    private void DetectarCliqueDireito()
+    {
         if (Input.GetKeyDown(KeyCode.Mouse1) && casaSelecionada.collider != null)
         {
-            if (!_timerRodando)
-            {
-                SceneManager.LoadScene(1);
-                return;
-            }
-
             Vector2Int coordenadaSelecionada = new((int)casaSelecionada.collider.gameObject.transform.localPosition.x, (int)casaSelecionada.collider.gameObject.transform.localPosition.y);
             if (engine.Tabuleiro.EncontrarCasa(coordenadaSelecionada).Escondida)
             {
@@ -234,7 +237,24 @@ public class UI_Manager : MonoBehaviour
                         }
                     }
                 }
-            }            
+            }
         }
+    }
+
+    private void FixedUpdate()
+    {
+        casaSelecionada = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+    }
+
+    private void Update()
+    {
+        if (_timerRodando)
+        {
+            tempoTexto.text = Time.timeSinceLevelLoad.ToString("0");
+            RessaltarCasasAoMouse();
+            DetectarCliqueDireito();
+        }
+
+        DetectarCliqueEsquerdo();
     }
 } 
