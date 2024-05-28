@@ -4,7 +4,7 @@
 
 ## Features
 
-A versão atual (1.1.0) contém as seguintes mecânicas implementadas:
+A versão atual (1.1.1) contém as seguintes mecânicas implementadas:
 
  ☑️ Distribuição aleatória de bombas
 
