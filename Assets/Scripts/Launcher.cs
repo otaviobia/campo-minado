@@ -32,7 +32,7 @@ public class Launcher : MonoBehaviour
     [SerializeField] private SaveSystem saveSystem;
 
     private AjustesDeJogo _ajustesDeJogo;
-    private AjustesDeJogo[] _modosDisponiveis;
+    private AjustesDeJogo[] _modosDisponiveis = new AjustesDeJogo[4];
 
     private string[] _nomesDasDificuldades = { "Fácil", "Médio", "Difícil", "Customizado" };
 

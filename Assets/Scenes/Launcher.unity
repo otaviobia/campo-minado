@@ -7099,6 +7099,19 @@ MonoBehaviour:
   master: {fileID: 24100000, guid: a4334f6f75e81914b9048ae40d5d9b1f, type: 2}
   volumeSlider: {fileID: 223437953}
   saveSystem: {fileID: 1857896773}
+  _modosDisponiveis:
+  - ModoAtual: 0
+    DimensoesDoTabuleiro: {x: 0, y: 0}
+    QuantidadeDeBombas: 0
+  - ModoAtual: 0
+    DimensoesDoTabuleiro: {x: 0, y: 0}
+    QuantidadeDeBombas: 0
+  - ModoAtual: 0
+    DimensoesDoTabuleiro: {x: 0, y: 0}
+    QuantidadeDeBombas: 0
+  - ModoAtual: 0
+    DimensoesDoTabuleiro: {x: 0, y: 0}
+    QuantidadeDeBombas: 0
 --- !u!4 &1857896772
 Transform:
   m_ObjectHideFlags: 0
